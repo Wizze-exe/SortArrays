@@ -2,12 +2,15 @@
 #include <stdlib.h>
 #include <ctime>
 #include <iomanip>
+#include <algorithm>
 
 using namespace std;
 
+const int sizeArray = 10000;
+
 //Заполнение массива
-void fillIntArray(int list[], int listLength);
-void fillDoubleArray(double list[], int listLength);
+void fillArray(int list[], int listLength);
+void fillArray(double list[], int listLength);
 
 //Бубль сортировка
 void bubbleSort(int list[], int listLength);
@@ -23,6 +26,8 @@ void insertionSort(int list[], int listLength);
 //Быстрая сортировка
 int partition(int list[], int start, int pivot);
 void quickSort(int list[], int start, int end);
+int partition(double list[], int start, int pivot);
+void quickSort(double list[], int start, int end);
 
 //Сортировка слиянием
 void merge(int list[], int start, int end, int mid);
@@ -35,39 +40,91 @@ void shellSort(int list[], int listLength);
 void heapify(int list[], int listLength, int root);
 void heapSort(int list[], int listLength);
 
-const int sizeArray = 10000;
-
 int main()
 {
 	int iArray[sizeArray];
 	double dArray[sizeArray];
 
-	fillIntArray(iArray, sizeArray);
+	//Бубль сортировка целочисленного массива:
+	fillArray(iArray, sizeArray);
 	unsigned int startTime = clock();
 	bubbleSort(iArray, sizeArray);
 	unsigned int endTime = clock();
 	cout << "Time of int bubble sort: " << endTime - startTime << " ms" << endl;
 
-	startTime = 0, endTime = 0;
-	fillDoubleArray(dArray, sizeArray);
+	//Быстрая сортировка целочисленного массива:
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	quickSort(iArray, 0, sizeArray - 1);
+	endTime = clock();
+	cout << "Time of int quick sort: " << endTime - startTime << " ms" << endl;
+
+	//Сортировка выбором целочисленного массива:
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	selectionSort(iArray, sizeArray);
+	endTime = clock();
+	cout << "Time of int selection sort: " << endTime - startTime << " ms" << endl;
+
+	//Сортировка вставками целочисленного массива:
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	insertionSort(iArray, sizeArray);
+	endTime = clock();
+	cout << "Time of int insertion sort: " << endTime - startTime << " ms" << endl;
+
+	//Сортировка слиянием целочисленного массива: 
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	mergeSort(iArray, 0, sizeArray);
+	endTime = clock();
+	cout << "Time of int merge sort: " << endTime - startTime << " ms" << endl;
+
+	//Сортировка Шелла целочисленного массива:
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	shellSort(iArray, sizeArray);
+	endTime = clock();
+	cout << "Time of int shell sort: " << endTime - startTime << " ms" << endl;
+
+	//Сортировка кучей целочисленного массива:
+	random_shuffle(begin(iArray), end(iArray));
+	startTime = clock();
+	heapSort(iArray, sizeArray);
+	endTime = clock();
+	cout << "Time of int heap sort: " << endTime - startTime << " ms" << endl;
+
+	//Бубль сортировка вещественного массива:
+	fillArray(dArray, sizeArray);
 	startTime = clock();
 	bubbleSort(dArray, sizeArray);
 	endTime = clock();
-	cout << "Time of double bubble sort: " << endTime - startTime << " ms";
+	cout << "Time of double bubble sort: " << endTime - startTime << " ms" << endl;
+
+	//Быстрая сортировка вещественного числа:
+	random_shuffle(begin(dArray), end(dArray));
+	startTime = clock();
+	quickSort(dArray, 0, sizeArray - 1);
+	endTime = clock();
+	cout << "Time of double quick sort: " << endTime - startTime << " ms" << endl;
+
+	//for (double &x : dArray) cout << ' ' << x;
 
 	return 0;
 }
 
-void fillIntArray(int list[], int listLength) {
+void fillArray(int list[], int listLength) {
 	srand(time(0));
 	for (int i = 0; i < listLength; i++) {
-		list[i] = rand() % 20000;
+		list[i] = rand() % 10000;
 	}
 }
 
-void fillDoubleArray(double list[], int listLength) {
+void fillArray(double list[], int listLength) {
+	srand(time(0));
 	for (int i = 0; i < listLength; i++) {
-		list[i] = 10000 * rand() / (float)RAND_MAX;
+		//list[i] = (double)(rand()) / RAND_MAX + (sizeArray - 0) + 0;
+		list[i] = 0 + ((double)rand() / RAND_MAX) * 10000;
 	}
 }
 
@@ -136,7 +193,6 @@ void insertionSort(int list[], int listLength) {
 		while (j >= 0 && list[j] > list[j + 1])
 		{
 			swap(list[j], list[j + 1]);
-			cout << "\ndid";
 			j--;
 		}
 	}
@@ -174,6 +230,38 @@ void quickSort(int list[], int start, int end) {
 	}
 }
 
+int partition(double list[], int start, int pivot) {
+	int i = start;
+	while (i < pivot)
+	{
+		if (list[i] > list[pivot] && i == pivot - 1)
+		{
+			swap(list[i], list[pivot]);
+			pivot--;
+		}
+
+		else if (list[i] > list[pivot])
+		{
+			swap(list[pivot - 1], list[pivot]);
+			swap(list[i], list[pivot]);
+			pivot--;
+		}
+
+		else i++;
+	}
+	return pivot;
+}
+
+void quickSort(double list[], int start, int end) {
+	if (start < end)
+	{
+		int pivot = partition(list, start, end);
+
+		quickSort(list, start, pivot - 1);
+		quickSort(list, pivot + 1, end);
+	}
+}
+
 void mergeSort(int list[], int start, int end) {
 	int mid;
 	if (start < end) {
@@ -186,7 +274,7 @@ void mergeSort(int list[], int start, int end) {
 }
 
 void merge(int list[], int start, int end, int mid) {
-	int mergedList[8];
+	int mergedList[sizeArray];
 	int i, j, k;
 	i = start;
 	k = start;
@@ -232,7 +320,6 @@ void shellSort(int list[], int listLength) {
 			{
 				swap(list[j], list[j - step]);
 				j -= step;
-				cout << "\ndid";
 			}
 		}
 	}
